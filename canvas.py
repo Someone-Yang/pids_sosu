@@ -22,7 +22,7 @@ def draw_arrow(targetCanvas:tk.Canvas, x, y, color, tags = "normal"):
     
 def draw_transfer(targetCanvas:tk.Canvas, x, y, text, color, tags = "normal"):
     circle_center = (x, y)
-    circle_radius = 9
+    circle_radius = 16
 
     targetCanvas.create_oval(
         circle_center[0] - circle_radius,
@@ -30,7 +30,7 @@ def draw_transfer(targetCanvas:tk.Canvas, x, y, text, color, tags = "normal"):
         circle_center[0] + circle_radius,
         circle_center[1] + circle_radius,
         outline=color,
-        width=2,
+        width=4,
         tags=tags
     )
 
@@ -38,7 +38,7 @@ def draw_transfer(targetCanvas:tk.Canvas, x, y, text, color, tags = "normal"):
         circle_center[0],
         circle_center[1],
         text=text,
-        font=("Arial",14),
+        font=("Arial",18),
         fill=color,
         tags=tags
     )
