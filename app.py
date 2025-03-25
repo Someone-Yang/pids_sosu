@@ -45,7 +45,7 @@ def loadStations():
     {"name":"小桥","name_eng":"Xiao qiao","transfer":["1","2"],"doors":0},
     {"name":"知识村","name_eng":"Zhi shi cun","transfer":[],"doors":0},
     {"name":"雪村","name_eng":"Xue cun","transfer":[],"doors":0},
-    {"name":"福瑞大道","name_eng":"Furui Blvd.","transfer":[],"doors":0},
+    {"name":"福瑞大道","name_eng":"Furui Blvd.","transfer":["2"],"doors":0},
     {"name":"前行路","name_eng":"Qianxing Rd.","transfer":[],"doors":0},
     {"name":"板桥","name_eng":"Ban qiao","transfer":[],"doors":0},
   ]
@@ -75,6 +75,11 @@ def printMain():
   stationDesEng = ""
   stationDes += "下一站"
   stationDesEng += "The next station is "
+
+  if nextStation == len(stations) - 1:
+    stationDes += "是本次列车的终点站"
+    stationDesEng += "the terminal station "
+
   stationDes += stations[nextStation]['name']
   stationDesEng += stations[nextStation]['name_eng']
 
@@ -110,6 +115,7 @@ def printLine():
   global nextStationLoc
   global nextStationArrowLoc
   global stations
+  global transferLines
   printSta = 0
   printLoc = 60
   printEach = (1920 - printLoc - printLoc - 432)/((len(stations) - 1)*2)
@@ -125,6 +131,11 @@ def printLine():
       canvas.draw_gradient_ball(baseCanvas,printLoc,340,22,(0xFF, 0xFF, 0xFF),(0x00, 0x99, 0x00),10)
     if printSta == nextStation:
       nextStationLoc=printLoc
+
+    printTransferLoc = 380
+    for tline in station['transfer']:
+      canvas.draw_transfer(baseCanvas,printLoc,printTransferLoc,transferLines[tline]['display'],transferLines[tline]['color'])
+      printTransferLoc += 22
     
     printLoc = printLoc + printEach
     # arrow

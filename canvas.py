@@ -1,5 +1,4 @@
 import tkinter as tk
-import math
 
 def draw_gradient_ball(targetCanvas:tk.Canvas ,x, y, radius, start_color, end_color, steps, tags = "normal"):
   for i in range(steps):
@@ -21,3 +20,25 @@ def draw_arrow(targetCanvas:tk.Canvas, x, y, color, tags = "normal"):
         fill=color, outline="#888888", width=2, tags=tags
 )
     
+def draw_transfer(targetCanvas:tk.Canvas, x, y, text, color, tags = "normal"):
+    circle_center = (x, y)
+    circle_radius = 9
+
+    targetCanvas.create_oval(
+        circle_center[0] - circle_radius,
+        circle_center[1] - circle_radius,
+        circle_center[0] + circle_radius,
+        circle_center[1] + circle_radius,
+        outline=color,
+        width=2,
+        tags=tags
+    )
+
+    targetCanvas.create_text(
+        circle_center[0],
+        circle_center[1],
+        text=text,
+        font=("Arial",14),
+        fill=color,
+        tags=tags
+    )
