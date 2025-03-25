@@ -1,7 +1,7 @@
 import tkinter as tk
 import math
 
-def draw_gradient_ball(targetCanvas:tk.Canvas ,x, y, radius, start_color, end_color, steps):
+def draw_gradient_ball(targetCanvas:tk.Canvas ,x, y, radius, start_color, end_color, steps, tags = "normal"):
   for i in range(steps):
     ratio = i / steps
     r = int(start_color[0] + (end_color[0] - start_color[0]) * ratio)
@@ -12,7 +12,7 @@ def draw_gradient_ball(targetCanvas:tk.Canvas ,x, y, radius, start_color, end_co
     targetCanvas.create_oval(
         x - current_radius, y - current_radius,
         x + current_radius, y + current_radius,
-        fill=color, outline=color
+        fill=color, outline=color, tags=tags
     )
 
 def draw_arrow(targetCanvas:tk.Canvas, x, y, color, tags = "normal"):
@@ -20,3 +20,4 @@ def draw_arrow(targetCanvas:tk.Canvas, x, y, color, tags = "normal"):
         (x,y),(x-8,y+16),(x+8,y+16),(x+16,y),(x+8,y-16),(x-8,y-16),
         fill=color, outline="#888888", width=2, tags=tags
 )
+    
