@@ -88,4 +88,11 @@ def getStations():
 # 第四个表示运行方向，0为正，1为倒
 # 反方向运行时，车站索引仍为正
 def getRunningStatus():
-  return (2,0,8,0)
+  # return (2,0,8,0)
+  # 正常接入其他系统，这里返回上面这样的元组即可
+  # 为方便测试，这里每次会读入根目录 status.txt 文件，运行时可修改查看不同站效果
+  with open('status.txt', 'r') as f:
+    content = f.read()
+  content = content.split(",")
+  status = tuple(int(data) for data in content)
+  return status

@@ -221,15 +221,27 @@ async def runShiftArrows():
     shiftArrows()
     await asyncio.sleep(1)
 
-async def mainRefresh():
-  await asyncio.gather(runShiftInfo(), runShiftArrows())
+async def runSync():
+  global runningStatus
+  prevStatus = runningStatus
+  while True:
+    if prevStatus != runningStatus:
+      mainInit()
+      shiftInfo()
+      shiftArrows()
+    prevStatus = config.getRunningStatus()
+    await asyncio.sleep(1)
 
-if __name__ == "__main__":
-  mainWindow()
+async def mainRefresh():
+  await asyncio.gather(runShiftInfo(), runShiftArrows(),runSync())
+
+def mainInit():
+  baseCanvas.delete("all")
   loadStations()
   printMain()
   printLine()
-  asyncio.run(mainRefresh())
-    
 
-  
+if __name__ == "__main__":
+  mainWindow()
+  mainInit()
+  asyncio.run(mainRefresh())
