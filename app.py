@@ -1,6 +1,7 @@
 import tkinter as tk
-import canvas
 import asyncio
+import canvas
+import config
 
 # 主窗口
 def mainWindow():
@@ -21,43 +22,25 @@ def mainWindow():
 def loadStations():
   global stations
   global transferLines
-  transferLines = {
-    "1":
-    {
-      "name":"1号线",
-      "name_eng":"Line 1",
-      "display":"1",
-      "color":"#854109"
-    },
-    "2":
-    {
-      "name":"2号线",
-      "name_eng":"Line 2",
-      "display":"2",
-      "color":"#ab15cd"
-    }
-  }
-  stations = [
-    {"name":"邮电大学","name_eng":"University of Posts & Telecommunications","name_eng_display":"University of Posts\n& Telecommunications","transfer":[],"doors":0},
-    {"name":"工会","name_eng":"Gonghui","name_eng_display":"Gong hui","transfer":[],"doors":0},
-    {"name":"胡罗贝","name_eng":"Huluobei","name_eng_display":"Hu luo bei","transfer":[],"doors":0},
-    {"name":"溪口","name_eng":"Xikou","name_eng_display":"Xi kou","transfer":[],"doors":0},
-    {"name":"小桥","name_eng":"Xiaoqiao","name_eng_display":"Xiao qiao","transfer":["1","2"],"doors":0},
-    {"name":"知识村","name_eng":"Zhishicun","name_eng_display":"Zhi shi cun","transfer":[],"doors":0},
-    {"name":"雪村","name_eng":"Xuecun","name_eng_display":"Xue cun","transfer":[],"doors":0},
-    {"name":"福瑞大道","name_eng":"Furui Blvd.","transfer":["2"],"doors":0},
-    {"name":"前行路","name_eng":"Qianxing Rd.","transfer":[],"doors":0},
-    {"name":"中山公园","name_eng":"Zhongshan Park","transfer":[],"doors":0},
-  ]
+  global runningStatus
+  transferLines = config.getTransferLines()
+  stations = config.getStations()
+  runningStatus = config.getRunningStatus()
 
   global nextStation
-  nextStation = 4
-  # 到站状态
+  nextStation = runningStatus[0]
+
   global nextStationStatus
-  nextStationStatus = 0
+  nextStationStatus = runningStatus[1]
 
   global terminus
-  terminus = stations[len(stations) - 1]
+  terminus = runningStatus[2]
+
+  if runningStatus[3] == 1:
+    stations.reverse()
+    nextStation = len(stations) - nextStation - 1
+    terminus = len(stations) - terminus - 1
+
 
 # 主线路信息
 def printMain():
@@ -68,10 +51,23 @@ def printMain():
   global stationDesStatus
   global stationDesEng
   global transferLines
+  global runningStatus
   baseCanvas.create_image(50, 60, anchor=tk.W, image=logoImage)
-  baseCanvas.create_text(400, 60, text="测试线路", font=('黑体', 20),anchor="w")
-  baseCanvas.create_text(700, 60, text=f"开往：{terminus['name']}", font=('黑体', 20),anchor="sw")
-  baseCanvas.create_text(700, 60, text=f"Terminus:{terminus['name_eng']}", font=('Arial', 16),anchor="nw")
+
+  currentLine = config.getCurrentLine()
+  baseCanvas.create_text(500, 60, text=currentLine['name'], font=('黑体', 24),anchor="s")
+  baseCanvas.create_text(500, 60, text=currentLine['name_eng'], font=('Arial', 20),anchor="n")
+
+  if stations[terminus].get('name_eng_display'):
+    terminalEngDisplay = stations[terminus]['name_eng_display']
+  else:
+    terminalEngDisplay = stations[terminus]['name_eng']
+  
+  baseCanvas.create_text(700, 60, text="开往：", font=('黑体', 20),anchor="s")
+  baseCanvas.create_text(700, 60, text="Terminus:", font=('Arial', 16),anchor="n")
+  baseCanvas.create_text(750, 60, text=stations[terminus]['name'], font=('黑体', 20),anchor="sw")
+  baseCanvas.create_text(750, 60, text=terminalEngDisplay, font=('Arial', 16),anchor="nw")
+
   if stations[nextStation].get('name_eng_display'):
     targetEngDisplay = stations[nextStation]['name_eng_display']
   else:
@@ -82,10 +78,11 @@ def printMain():
   else:
     targetNextDisplay = "当前站："
     targetNextDisplayEng = "Current Station:"
-  targetNextDisplay += stations[nextStation]['name']
-  targetNextDisplayEng += targetEngDisplay
-  baseCanvas.create_text(1100, 60, text=targetNextDisplay, font=('黑体', 20),anchor="sw")
-  baseCanvas.create_text(1100, 60, text=targetNextDisplayEng, font=('Arial', 16),anchor="nw")
+
+  baseCanvas.create_text(1100, 60, text=targetNextDisplay, font=('黑体', 20),anchor="s")
+  baseCanvas.create_text(1100, 60, text=targetNextDisplayEng, font=('Arial', 16),anchor="n")
+  baseCanvas.create_text(1180, 60, text=stations[nextStation]['name'], font=('黑体', 20),anchor="sw")
+  baseCanvas.create_text(1180, 60, text=targetEngDisplay, font=('Arial', 16),anchor="nw")
 
   stationDes = ""
   stationDesEng = ""
@@ -96,7 +93,7 @@ def printMain():
     stationDes += "当前站"
     stationDesEng += "This station is "
 
-  if nextStation == len(stations) - 1:
+  if nextStation == terminus:
     stationDes += "是本次列车的终点站"
     stationDesEng += "the terminal station "
 
@@ -123,7 +120,8 @@ def printMain():
     stationDes += "右"
     stationDesEng += "right"
   stationDes += "侧车门。"
-  stationDesEng += "."
+  stationDesEng += ". "
+
   stationDesStatus = True
   root.update()
 
@@ -136,14 +134,15 @@ def printLine():
   global nextStationArrowLoc
   global stations
   global transferLines
+  global runningStatus
   printSta = 0
-  printLoc = 60
-  printEach = (1920 - printLoc - printLoc - 432)/((len(stations) - 1)*2)
+  printLoc = 32
+  printEach = (1920 - 32 - 50 - 450)/((len(stations) - 1)*2)
   printArrow = (printEach - 16) / 2
   nextStationLoc = 0
   nextStationArrowLoc = 0
   for station in stations:
-    if printSta < nextStation:
+    if printSta < nextStation or printSta > terminus:
       targetTextColor = "grey"
     elif printSta >= nextStation:
       targetTextColor = "black"
@@ -153,22 +152,22 @@ def printLine():
     else:
       targetEngDisplay = station['name_eng']
     baseCanvas.create_text(printLoc, 300, text=targetEngDisplay, font=('Arial', 14), angle=45, anchor=tk.NW, fill=targetTextColor)
-    if printSta < nextStation:
+    if printSta < nextStation or printSta > terminus:
       canvas.draw_gradient_ball(baseCanvas,printLoc,340,22,(0xFF, 0xFF, 0xFF),(0xAA, 0xAA, 0xAA),10)
     elif printSta >= nextStation:
       canvas.draw_gradient_ball(baseCanvas,printLoc,340,22,(0xFF, 0xFF, 0xFF),(0x00, 0x99, 0x00),10)
     if printSta == nextStation:
       nextStationLoc=printLoc
 
-    printTransferLoc = 390
+    printTransferLoc = 380
     for tline in station['transfer']:
       canvas.draw_transfer(baseCanvas,printLoc,printTransferLoc,transferLines[tline]['display'],transferLines[tline]['color'])
-      printTransferLoc += 40
+      printTransferLoc += 32
     
     printLoc = printLoc + printEach
     # arrow
     if printSta + 1 < len(stations):
-      if printSta + 1 <= nextStation:
+      if printSta + 1 <= nextStation or printSta + 1 > terminus:
         arrowColor = "#AAAAAA"
       elif printSta + 1 > nextStation:
         arrowColor = "#00FF00"

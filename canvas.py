@@ -16,13 +16,13 @@ def draw_gradient_ball(targetCanvas:tk.Canvas ,x, y, radius, start_color, end_co
 
 def draw_arrow(targetCanvas:tk.Canvas, x, y, color, tags = "normal"):
     targetCanvas.create_polygon(
-        (x,y),(x-8,y+16),(x+8,y+16),(x+16,y),(x+8,y-16),(x-8,y-16),
+        (x,y),(x-6,y+12),(x+6,y+12),(x+12,y),(x+6,y-12),(x-6,y-12),
         fill=color, outline="#888888", width=2, tags=tags
 )
     
 def draw_transfer(targetCanvas:tk.Canvas, x, y, text, color, tags = "normal"):
     circle_center = (x, y)
-    circle_radius = 16
+    circle_radius = 12
 
     targetCanvas.create_oval(
         circle_center[0] - circle_radius,
@@ -30,7 +30,7 @@ def draw_transfer(targetCanvas:tk.Canvas, x, y, text, color, tags = "normal"):
         circle_center[0] + circle_radius,
         circle_center[1] + circle_radius,
         outline=color,
-        width=4,
+        width=2,
         tags=tags
     )
 
@@ -38,7 +38,20 @@ def draw_transfer(targetCanvas:tk.Canvas, x, y, text, color, tags = "normal"):
         circle_center[0],
         circle_center[1],
         text=text,
-        font=("Arial",18),
+        font=("Arial",14),
         fill=color,
         tags=tags
     )
+
+def draw_rounded_rectangle(targetCanvas:tk.Canvas, x1, y1, x2, y2, radius, fill, tags = "normal"):
+    points = [
+        x1 + radius, y1,
+        x2 - radius, y1,
+        x2, y1 + radius,
+        x2, y2 - radius,
+        x2 - radius, y2,
+        x1 + radius, y2,
+        x1, y2 - radius,
+        x1, y1 + radius
+    ]
+    targetCanvas.create_polygon(points, smooth=True, fill=fill, tags=tags)
