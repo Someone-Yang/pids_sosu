@@ -66,18 +66,18 @@ def getTransferLines():
 def getStations():
   return [
     {"name":"望村","name_eng":"Wangcun","name_eng_display":"Wang cun","transfer":["3"],"doors":0},
-    {"name":"芳村","name_eng":"Fangcun","name_eng_display":"Fang cun","transfer":[],"doors":0},
-    {"name":"黄雀东","name_eng":"Sparrow East Main Station","name_eng_display":"Sparrow East\nMain Station","transfer":["2","furry"],"doors":0},
-    {"name":"石村","name_eng":"Shicun","name_eng_display":"Shi cun","transfer":[],"doors":0},
-    {"name":"山村","name_eng":"Shancun","name_eng_display":"Shan cun","transfer":[],"doors":1},
-    {"name":"雪村","name_eng":"Xuecun","name_eng_display":"Xue cun","transfer":[],"doors":1},
-    {"name":"林樱万花","name_eng":"Linying Wanhua","transfer":["4"],"doors":1},
-    {"name":"南村","name_eng":"Nancun (South Village)","name_eng_display":"Nan cun","transfer":[],"doors":1},
-    {"name":"十亭","name_eng":"Shiting","transfer":["1","2","3"],"doors":0},
-    {"name":"新天","name_eng":"Xintian","name_eng_display":"Xin tian","transfer":[],"doors":0},
-    {"name":"福瑞路","name_eng":"Furry Road","transfer":[],"doors":0},
-    {"name":"安定","name_eng":"Anding","name_eng_display":"An ding","transfer":[],"doors":0},
-    {"name":"司南北站","name_eng":"Sinan North Railway Station","name_eng_display":"Sinan North\nRailway Station","transfer":["furry"],"doors":0},
+    {"name":"芳村","name_eng":"Fangcun","name_eng_display":"Fang cun","doors":0},
+    {"name":"黄雀东","name_eng":"Sparrow East Main Station","name_eng_display":"Sparrow East\nMain Station","transfer":["2","furry"],"doors":0,"interests":"去往信标隧道的乘客请在此站下车"},
+    {"name":"石村","name_eng":"Shicun","name_eng_display":"Shi cun","doors":0},
+    {"name":"山村","name_eng":"Shancun","name_eng_display":"Shan cun","doors":1},
+    {"name":"雪村","name_eng":"Xuecun","name_eng_display":"Xue cun","doors":1},
+    {"name":"林樱万花","name_eng":"Linying Wanhua","transfer":["4"],"doors":1,"interests":"去往樱花园的乘客请在此站下车"},
+    {"name":"南村","name_eng":"Nancun (South Village)","name_eng_display":"Nan cun","doors":1},
+    {"name":"十亭","name_eng":"Shiting","transfer":["1","2","3"],"doors":0,"interests":"换乘1号线、2号线的乘客请从站台中部搭扶梯上楼，换乘3号线的乘客请至7站台搭扶梯上楼"},
+    {"name":"新天","name_eng":"Xintian","name_eng_display":"Xin tian","doors":0},
+    {"name":"福瑞路","name_eng":"Furry Road","doors":0},
+    {"name":"安定","name_eng":"Anding","name_eng_display":"An ding","doors":0},
+    {"name":"司南北站","name_eng":"Sinan North Railway Station","name_eng_display":"Sinan North\nRailway Station","transfer":["furry"],"doors":0,"interests":"去往司南北火车站，转乘氧猫铁路的乘客请在此站下车"},
   ]
 
 # 下站信息

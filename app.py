@@ -48,83 +48,89 @@ def printMain():
   global terminus
   global stations
   global stationDes
-  global stationDesStatus
-  global stationDesEng
+  global stationDesStep
   global transferLines
   global runningStatus
-  global shiftDoorStep
   baseCanvas.create_image(50, 60, anchor=tk.W, image=logoImage)
 
   currentLine = config.getCurrentLine()
   baseCanvas.create_text(500, 60, text=currentLine['name'], font=('黑体', 24),anchor="s")
   baseCanvas.create_text(500, 60, text=currentLine['name_eng'], font=('Arial', 20),anchor="n")
 
-  if stations[terminus].get('name_eng_display'):
-    terminalEngDisplay = stations[terminus]['name_eng_display']
-  else:
-    terminalEngDisplay = stations[terminus]['name_eng']
+  terminalEngDisplay = stations[terminus]['name_eng']
   
-  baseCanvas.create_text(700, 60, text="开往：", font=('黑体', 20),anchor="s")
-  baseCanvas.create_text(700, 60, text="Terminus:", font=('Arial', 16),anchor="n")
+  baseCanvas.create_text(700, 60, text="开往", font=('黑体', 20),anchor="s")
+  baseCanvas.create_text(700, 60, text="Terminus", font=('Arial', 16),anchor="n")
   baseCanvas.create_text(750, 60, text=stations[terminus]['name'], font=('黑体', 20),anchor="sw")
   baseCanvas.create_text(750, 60, text=terminalEngDisplay, font=('Arial', 16),anchor="nw")
 
-  if stations[nextStation].get('name_eng_display'):
-    targetEngDisplay = stations[nextStation]['name_eng_display']
-  else:
-    targetEngDisplay = stations[nextStation]['name_eng']
+  targetEngDisplay = stations[nextStation]['name_eng']
   if nextStationStatus == 0:
-    targetNextDisplay = "下一站："
-    targetNextDisplayEng = "Next Station:"
+    targetNextDisplay = "下一站"
+    targetNextDisplayEng = "Next Station"
   else:
-    targetNextDisplay = "当前站："
-    targetNextDisplayEng = "Current Station:"
+    targetNextDisplay = "当前站"
+    targetNextDisplayEng = "Current Station"
 
   baseCanvas.create_text(1100, 60, text=targetNextDisplay, font=('黑体', 20),anchor="s")
   baseCanvas.create_text(1100, 60, text=targetNextDisplayEng, font=('Arial', 16),anchor="n")
   baseCanvas.create_text(1180, 60, text=stations[nextStation]['name'], font=('黑体', 20),anchor="sw")
   baseCanvas.create_text(1180, 60, text=targetEngDisplay, font=('Arial', 16),anchor="nw")
 
-  stationDes = ""
-  stationDesEng = ""
+  stationDes = []
+
+  stationDesStep = 0
+
+  stationDesSta = ""
+  stationDesStaEng = ""
   if nextStationStatus == 0:
-    stationDes += "下一站"
-    stationDesEng += "The next station is "
+    stationDesSta += "下一站"
+    stationDesStaEng += "The next station is "
   else:
-    stationDes += "当前站"
-    stationDesEng += "This station is "
+    stationDesSta += "当前站"
+    stationDesStaEng += "This station is "
 
   if nextStation == terminus:
-    stationDes += "是本次列车的终点站"
-    stationDesEng += "the terminal station "
+    stationDesSta += "是本次列车的终点站"
+    stationDesStaEng += "the terminal station "
 
-  stationDes += stations[nextStation]['name']
-  stationDesEng += stations[nextStation]['name_eng']
+  stationDesSta += stations[nextStation]['name']
+  stationDesStaEng += stations[nextStation]['name_eng']
 
-  if stations[nextStation]['transfer']:
-    stationDes += "，可换乘"
-    stationDesEng += ". Transfer to "
+  stationDes.insert(0,stationDesSta)
+  stationDes.append(stationDesStaEng)
+
+  stationDesDoor = "请从列车运行方向"
+  stationDesDoorEng = "Please get ready to exit from the "
+  if stations[nextStation]['doors'] == 0:
+    stationDesDoor += "左"
+    stationDesDoorEng += "left"
+  else:
+    stationDesDoor += "右"
+    stationDesDoorEng += "right"
+  stationDesDoor += "侧车门下车"
+  stationDesDoorEng += " side"
+
+  stationDes.insert(len(stationDes) // 2,stationDesDoor)
+  stationDes.append(stationDesDoorEng)
+
+  if stations[nextStation].get("transfer"):
+    stationDesTrs = "乘客可以换乘"
+    stationDesTrsEng = "Passengers can transfer to "
     textTransferLeft = len(stations[nextStation]['transfer'])
     for tline in stations[nextStation]['transfer']:
-      stationDes += transferLines[tline]['name']
-      stationDesEng += transferLines[tline]['name_eng']
+      stationDesTrs += transferLines[tline]['name']
+      stationDesTrsEng += transferLines[tline]['name_eng']
       textTransferLeft -= 1
       if textTransferLeft != 0:
-        stationDes += "、"
-        stationDesEng += ", "
-  stationDes += "，开"
-  stationDesEng += ". Doors open on the "
-  if stations[nextStation]['doors'] == 0:
-    stationDes += "左"
-    stationDesEng += "left"
-  else:
-    stationDes += "右"
-    stationDesEng += "right"
-  stationDes += "侧车门。"
-  stationDesEng += ". "
+        stationDesTrs += "、"
+        stationDesTrsEng += ", "
+    stationDes.insert(len(stationDes) // 2,stationDesTrs)
+    stationDes.append(stationDesTrsEng)
 
-  stationDesStatus = True
-  shiftDoorStep = 0
+  if stations[nextStation].get("interests"):
+    stationDes.insert(len(stationDes) // 2,stations[nextStation]['interests'])
+
   root.update()
 
 def printLine():
@@ -144,7 +150,7 @@ def printLine():
   printArrow = (printEach - 16) / 2
   nextStationLoc = 0
   nextStationArrowLoc = 0
-  lineLoc = 310
+  lineLoc = 305
   for station in stations:
     if printSta < nextStation or printSta > terminus:
       targetTextColor = "grey"
@@ -163,11 +169,12 @@ def printLine():
     if printSta == nextStation:
       nextStationLoc=printLoc
 
-    printTransferLoc = 344
-    printTransferLocRow = printLoc - (len(station['transfer'])-1) * 14
-    for tline in station['transfer']:
-      canvas.draw_transfer(baseCanvas,printTransferLocRow,printTransferLoc,transferLines[tline]['display'],transferLines[tline]['color'])
-      printTransferLocRow = printTransferLocRow + 28
+    if station.get("transfer"):
+      printTransferLoc = 344
+      printTransferLocRow = printLoc - (len(station['transfer'])-1) * 14
+      for tline in station['transfer']:
+        canvas.draw_transfer(baseCanvas,printTransferLocRow,printTransferLoc,transferLines[tline]['display'],transferLines[tline]['color'])
+        printTransferLocRow = printTransferLocRow + 28
     
     printLoc = printLoc + printEach
     # arrow
@@ -204,17 +211,18 @@ def shiftArrows():
   root.update()
 
 def shiftInfo():
-  global stationDesStatus
+  global stationDesStep
   global stationDes
-  global stationDesEng
-  if stationDesStatus:
-    baseCanvas.delete("infoeng")
-    baseCanvas.create_text(60, 140, text=stationDes, font=('黑体', 20),anchor="nw",tags="infocn")
-    stationDesStatus = False
+  if stationDesStep >= len(stationDes):
+    stationDesStep = 0
+  baseCanvas.delete("info")
+  targetFont = ""
+  if stationDesStep >= (len(stationDes) / 2):
+    targetFont = "Arial"
   else:
-    baseCanvas.delete("infocn")
-    baseCanvas.create_text(60, 140, text=stationDesEng, font=('Arial', 20),anchor="nw",tags="infoeng")
-    stationDesStatus = True
+    targetFont = "黑体"
+  baseCanvas.create_text(60, 120, text=stationDes[stationDesStep], font=(targetFont, 20),anchor="nw",tags="info")
+  stationDesStep = stationDesStep + 1
   root.update()
 
 async def runShiftInfo():
