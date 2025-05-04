@@ -8,7 +8,7 @@ def mainWindow():
   global root
   root = tk.Tk()
 
-  root.geometry("1920x480")
+  root.geometry("1920x360")
   root.overrideredirect(True)
 
   global baseCanvas
@@ -52,6 +52,7 @@ def printMain():
   global stationDesEng
   global transferLines
   global runningStatus
+  global shiftDoorStep
   baseCanvas.create_image(50, 60, anchor=tk.W, image=logoImage)
 
   currentLine = config.getCurrentLine()
@@ -123,6 +124,7 @@ def printMain():
   stationDesEng += ". "
 
   stationDesStatus = True
+  shiftDoorStep = 0
   root.update()
 
 def printLine():
@@ -135,34 +137,37 @@ def printLine():
   global stations
   global transferLines
   global runningStatus
+  global lineLoc
   printSta = 0
   printLoc = 32
   printEach = (1920 - 32 - 50 - 450)/((len(stations) - 1)*2)
   printArrow = (printEach - 16) / 2
   nextStationLoc = 0
   nextStationArrowLoc = 0
+  lineLoc = 310
   for station in stations:
     if printSta < nextStation or printSta > terminus:
       targetTextColor = "grey"
     elif printSta >= nextStation:
       targetTextColor = "black"
-    baseCanvas.create_text(printLoc, 300, text=station['name'], font=('黑体', 22), angle=45, anchor=tk.SW, fill=targetTextColor)
+    baseCanvas.create_text(printLoc, lineLoc - 38, text=station['name'], font=('黑体', 22), angle=45, anchor=tk.SW, fill=targetTextColor)
     if station.get('name_eng_display'):
       targetEngDisplay = station['name_eng_display']
     else:
       targetEngDisplay = station['name_eng']
-    baseCanvas.create_text(printLoc, 300, text=targetEngDisplay, font=('Arial', 14), angle=45, anchor=tk.NW, fill=targetTextColor)
+    baseCanvas.create_text(printLoc, lineLoc - 38, text=targetEngDisplay, font=('Arial', 14), angle=45, anchor=tk.NW, fill=targetTextColor)
     if printSta < nextStation or printSta > terminus:
-      canvas.draw_gradient_ball(baseCanvas,printLoc,340,22,(0xFF, 0xFF, 0xFF),(0xAA, 0xAA, 0xAA),10)
+      canvas.draw_gradient_ball(baseCanvas,printLoc,lineLoc,22,(0xFF, 0xFF, 0xFF),(0xAA, 0xAA, 0xAA),10)
     elif printSta >= nextStation:
-      canvas.draw_gradient_ball(baseCanvas,printLoc,340,22,(0xFF, 0xFF, 0xFF),(0x00, 0x99, 0x00),10)
+      canvas.draw_gradient_ball(baseCanvas,printLoc,lineLoc,22,(0xFF, 0xFF, 0xFF),(0x00, 0x99, 0x00),10)
     if printSta == nextStation:
       nextStationLoc=printLoc
 
-    printTransferLoc = 380
+    printTransferLoc = 344
+    printTransferLocRow = printLoc - (len(station['transfer'])-1) * 14
     for tline in station['transfer']:
-      canvas.draw_transfer(baseCanvas,printLoc,printTransferLoc,transferLines[tline]['display'],transferLines[tline]['color'])
-      printTransferLoc += 32
+      canvas.draw_transfer(baseCanvas,printTransferLocRow,printTransferLoc,transferLines[tline]['display'],transferLines[tline]['color'])
+      printTransferLocRow = printTransferLocRow + 28
     
     printLoc = printLoc + printEach
     # arrow
@@ -171,9 +176,9 @@ def printLine():
         arrowColor = "#AAAAAA"
       elif printSta + 1 > nextStation:
         arrowColor = "#00FF00"
-      canvas.draw_arrow(baseCanvas,printLoc,340,arrowColor)
-      canvas.draw_arrow(baseCanvas,printLoc - printArrow,340,arrowColor)
-      canvas.draw_arrow(baseCanvas,printLoc + printArrow,340,arrowColor)
+      canvas.draw_arrow(baseCanvas,printLoc,lineLoc,arrowColor)
+      canvas.draw_arrow(baseCanvas,printLoc - printArrow,lineLoc,arrowColor)
+      canvas.draw_arrow(baseCanvas,printLoc + printArrow,lineLoc,arrowColor)
       if printSta + 1 == nextStation:
         nextStationArrowLoc=printLoc
     printLoc = printLoc + printEach
@@ -183,6 +188,7 @@ def printLine():
 def shiftArrows():
   global nsashow
   global root
+  global lineLoc
   if nsashow:
     if nextStationStatus == 0:
       baseCanvas.delete("nextarr")
@@ -190,10 +196,10 @@ def shiftArrows():
       nsashow = False
   else:
     if nextStationStatus == 0 and nextStation > 0:
-      canvas.draw_arrow(baseCanvas,nextStationArrowLoc,340,"#CC0000","nextarr")
-      canvas.draw_arrow(baseCanvas,nextStationArrowLoc - printArrow,340,"#CC0000","nextarr")
-      canvas.draw_arrow(baseCanvas,nextStationArrowLoc + printArrow,340,"#CC0000","nextarr")
-    canvas.draw_gradient_ball(baseCanvas,nextStationLoc,340,22,(0xFF, 0xFF, 0xFF),(0xFF, 0x00, 0x00),10,"nextball")
+      canvas.draw_arrow(baseCanvas,nextStationArrowLoc,lineLoc,"#CC0000","nextarr")
+      canvas.draw_arrow(baseCanvas,nextStationArrowLoc - printArrow,lineLoc,"#CC0000","nextarr")
+      canvas.draw_arrow(baseCanvas,nextStationArrowLoc + printArrow,lineLoc,"#CC0000","nextarr")
+    canvas.draw_gradient_ball(baseCanvas,nextStationLoc,lineLoc,22,(0xFF, 0xFF, 0xFF),(0xFF, 0x00, 0x00),10,"nextball")
     nsashow = True
   root.update()
 
